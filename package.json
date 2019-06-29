@@ -1,0 +1,32 @@
+{
+  "name": "ajowalletapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gidox1/ajoWalletAPI.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gidox1/ajoWalletAPI/issues"
+  },
+  "homepage": "https://github.com/gidox1/ajoWalletAPI#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
+    "bookshelf": "^0.15.1",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "0.15.0",
+    "lodash": "^4.17.11",
+    "mysql": "^2.17.1",
+    "nodemon": "^1.19.1",
+    "redis": "^2.8.0",
+    "shortid": "^2.2.14"
+  }
+}
