@@ -4,10 +4,10 @@ This is a mini-wallet system
 
 To run, you must have docker installed on your machine. preferably Version 17.12.0-ce-mac55
 Once installed, run ./bin/start.sh in your terminal.
-This should spin up a disposable app conntainer.
+This should spin up a disposable app container.
 
-Another script that can be cound there is the clean.sh, which when run with the command
-./bin/clean.sh will stop all containers created with a predefined image.
+Another script that can be found there is the clean.sh, which when run with the command
+./bin/clean.sh will stop all containers created with the predefined image.
 
 The app is built in such a way that way that notable actions have their own custom routes and test ca be done 
 via postman.
