@@ -6,6 +6,8 @@ To run, you must have docker installed on your machine. preferably Version 17.12
 Once installed, run ./bin/start.sh in your terminal.
 This should spin up a disposable app container.
 
+To run migration: knex migrate:latest
+
 Another script that can be found there is the clean.sh, which when run with the command
 ./bin/clean.sh will stop all containers created with the predefined image.
 
