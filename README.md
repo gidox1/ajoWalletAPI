@@ -51,4 +51,3 @@ getOtp (GET): Returns a four digit OTP on success and a fail otherwise
 
 
 This app requires a .env file for secrets and db configs (production scenario).
-It aslo requires a database.
