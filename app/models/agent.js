@@ -10,7 +10,7 @@ let Agent = bookshelf.Model.extend({
         return new Agent()
             .save(payload, {method: 'insert'})
             .then(serviceResponse => {
-                console.log('SERVICE', serviceResponse);
+                console.log(serviceResponse);
             })
             .catch(err => {
                 console.log('an error occured within model', err);
@@ -21,7 +21,6 @@ let Agent = bookshelf.Model.extend({
             return await new Agent()
             .query((qb) => {
                 qb.where(condition, operand, data)
-                qb.debug(true)
             })
             .fetchAll();
     }

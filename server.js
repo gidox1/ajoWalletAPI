@@ -24,5 +24,5 @@ const server = http.createServer(app);
 
 server.listen(port, (err, res) => {
     if(err) {console.log('Could not start server'); return false;}
-    console.log(`server running on....${port}`);
+    console.log(`Nodemon is keeping me alive on port ${port} ...  ¯\_(ツ)_/¯ `);
 })

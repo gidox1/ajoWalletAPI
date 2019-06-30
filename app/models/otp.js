@@ -10,7 +10,6 @@ let Otp = bookshelf.Model.extend({
             return await new Otp()
             .query((qb) => {
                 qb.where(condition, operand, data)
-                qb.debug(true)
             })
             .fetchAll();
     },

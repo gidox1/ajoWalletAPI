@@ -20,7 +20,7 @@ class Agent
                     : res.status(409).json({status: 'error', message: serviceResponse.message})
             })
             .catch(err => {
-                throw err;
+                console.log('Internal Server Error', err);
             })
     }
 
@@ -37,7 +37,7 @@ class Agent
                     : res.status(409).json({status: 'error', message: serviceResponse.message})
             })
             .catch(err => {
-                throw err;
+                console.log('Internal Server Error', err);
             })
     }
 
@@ -46,14 +46,14 @@ class Agent
     async credit(req, res) {
         const userObjectFromToken = res.locals.user.payload[0];
         const {amount, reference_number, pin, otp} = req.body;
-        return await service.credit(amount, reference_number, pin, otp, userObjectFromToken);
-        // .then(serviceResponse => {
-        //     return (serviceResponse.status === true) ? res.status(200).json({status: 'success', message: 'successfully Logged in', access_token: serviceResponse.token})
-        //         : res.status(409).json({status: 'error', message: serviceResponse.message})
-        // })            
-        // .catch(err => {
-        //     throw err;
-        // })
+        return await service.credit(amount, reference_number, pin, otp, userObjectFromToken)
+        .then(serviceResponse => {
+            return (serviceResponse.status === true) ? res.status(200).json({status: 'success', message: serviceResponse.message})
+                : res.status(409).json({status: 'error', message: serviceResponse.message})
+        })            
+        .catch(err => {
+            console.log('Internal Server Error', err);
+        })
     }
 
     async getOtp(req, res) {
@@ -62,6 +62,9 @@ class Agent
             .then(otpResponse => {
                 (otpResponse.status === true) ? res.status(200).json({status:'success', otp: otpResponse.otp}) : 
                     res.status(409).json({status: 'fail'});
+            })
+            .catch(err => {
+                console.log('Internal Server Error', err);
             })
     }
 } 

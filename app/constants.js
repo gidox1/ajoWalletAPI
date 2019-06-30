@@ -6,6 +6,9 @@ const prefix = 'ajo';
 const shortId = require('shortid');
 const agentActive = 1;
 const agentBlocked =0;
+const actionCredit = 'credit';
+const actionDebit = 'debit';
+const failedTransactionMessage = 'Unable to complete transaction. Please try again later';
 
 function generateReferenceNumber() {;
     const refNum = prefix + shortId.generate();
@@ -17,6 +20,10 @@ function otpGenerator() {
     return randomOtp;
 }
 
+function parseJSON(objectModel) {
+    return JSON.parse(JSON.stringify(objectModel));
+}
+
 module.exports = {
     allowed_keys,
     operandEquals,
@@ -24,5 +31,9 @@ module.exports = {
     generateReferenceNumber,
     agentActive,
     agentBlocked,
-    otpGenerator
+    otpGenerator,
+    parseJSON,
+    actionCredit,
+    actionDebit,
+    failedTransactionMessage
 }
