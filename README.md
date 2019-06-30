@@ -41,7 +41,7 @@ Sample Payload = {
 }
 
 
-Credit (POST): (unfinished) : The routed is protected, so the token generated on login must be supplied as a parm with the key "access_token"
+Credit (POST): The routed is protected, so the token generated on login must be supplied as a parm with the key "access_token"
 SamplePayload = {
 	"amount": 5000,
 	"reference_number": "ajolscQF147h",
