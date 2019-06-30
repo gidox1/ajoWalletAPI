@@ -8,8 +8,11 @@ class Agent
 {
 
     /**
-    * Handles User Creation
-   */
+     *Handles Agent Creation
+     *
+     * @param {object} req request object
+     * @param {object } res response object
+     */
     async register(req, res) 
     {
         const payload = req.body;
@@ -23,11 +26,14 @@ class Agent
                 console.log('Internal Server Error', err);
             })
     }
-
+    
 
     /**
-    * Handles User Log in
-    */
+     *Handles Agent Login
+     *
+     * @param {object} req request object
+     * @param {object } res response object
+     */
     async login(req, res) 
     {
         const {email, password} = req.body;
@@ -43,6 +49,12 @@ class Agent
 
 
 
+    /**
+     *Handles Agent Wallet Credit
+     *
+     * @param {object} req request object
+     * @param {object } res response object
+     */
     async credit(req, res) {
         const userObjectFromToken = res.locals.user.payload[0];
         const {amount, reference_number, pin, otp} = req.body;
@@ -56,6 +68,14 @@ class Agent
         })
     }
 
+
+
+    /**
+     * Handles OTP Creation an Validation
+     *
+     * @param {object} req request object
+     * @param {object } res response object
+     */
     async getOtp(req, res) {
         const reference_number = res.locals.user.payload[0].reference_number;
         return await service.getOtp(reference_number)

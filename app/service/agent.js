@@ -16,9 +16,13 @@ const action = constants.actionCredit;
 
 class AgentService 
 {
+    
     /**
-    * Handles User Creation
-    */
+     *Handles Agent Creation
+     *
+     * @param {object} data 
+     * @param {Array} allowed_keys 
+     */
     async register (data, allowed_keys) {   
             const agentData = await _.pick(data, allowed_keys);
             const reference_number = await constants.generateReferenceNumber();
@@ -52,9 +56,14 @@ class AgentService
     }
 
 
+    
+    
     /**
-    * Handles User Log in
-    */
+     * Handles Agent Lohin
+     *
+     * @param {string} email 
+     * @param {string } password 
+     */
     async login(email, password) {
         const params = {email, password};
         const agentCheck = await this.checkUser('email', operand, email);
@@ -75,6 +84,13 @@ class AgentService
         }
     }
 
+
+
+
+    /**
+     * Handles OTP Creation
+     * @param {string} reference_number 
+     */
     async getOtp(reference_number) {
         const generatedOtp = await constants.otpGenerator();
         const data = {reference_number, generatedOtp}
@@ -85,6 +101,17 @@ class AgentService
         }
     }
 
+
+
+
+    /**
+     * Handles Agent Wallet Credit
+     * @param {Number} amount 
+     * @param {string } reference_number 
+     * @param {Number} pin
+     * @param {Number} otp
+     * @param {object} userObjectFromToken
+     */
     async credit(amount, reference_number, pin, otp, userObjectFromToken) {
         const email = userObjectFromToken.email;
         const sentPassword = pin.toString();
@@ -120,7 +147,7 @@ class AgentService
                 const previous_balance = parsedWallet[0]['current_balance'];
                 return new WalletModel().updateWallet({current_balance, previous_balance, reference_number})
                     .then(async (transactionResponse) => {
-                        new TransactionModel().logTransaction({senderRefNum, amount, action, recepientReferenceNumber, status: transactionResponse.status});
+                        await new TransactionModel().logTransaction({senderRefNum, amount, action, recepientReferenceNumber, status: transactionResponse.status});
 
                         if(transactionResponse.status == 'success') {
                             const sendersWallet = await new WalletModel().findWallet('reference_number', operand, senderRefNum);
@@ -128,14 +155,15 @@ class AgentService
 
                             const sendersCurrentBalance = walletDetails[0]['current_balance'] - amount;
                             const sendersPreviousBalance = walletDetails[0]['current_balance'];
-                            return await new WalletModel().updateWallet({current_balance: sendersCurrentBalance, previous_balance: sendersPreviousBalance, reference_number: senderRefNum})
-                                .then(update => {
-                                    return (update.status == 'success') ? {status: true, message: 'Credit Successful'} 
-                                    : {status: false, message: constants.failedTransactionMessage}
-                                })
-                                .catch(err => {
-                                    throw err;
-                                })
+                            return await new WalletModel()
+                                .updateWallet({current_balance: sendersCurrentBalance, previous_balance: sendersPreviousBalance, reference_number: senderRefNum})
+                                    .then(update => {
+                                        return (update.status == 'success') ? {status: true, message: 'Credit Successful'} 
+                                        : {status: false, message: constants.failedTransactionMessage}
+                                    })
+                                    .catch(err => {
+                                        throw err;
+                                    })
                         }
                     })
                     .catch(error => {
@@ -149,9 +177,15 @@ class AgentService
 
     }
 
+
+
+
     /**
-    * Checks User in DB
-    */
+     * Returns Agent Details
+     * @param {string} condition 
+     * @param {string } operand 
+     * @param {string} data
+     */
     async checkUser (condition, operand, data) {
         return new Promise(async (resolve, reject) => {
             const userModel =  await new AgentModel()
