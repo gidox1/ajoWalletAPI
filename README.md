@@ -17,7 +17,7 @@ via postman.
 The endpoints currently on the app as at this time are:
 => Agent Registration
 => Agent Login
-=> Agent Wallet Credit (unfinished)
+=> Agent Wallet Credit 
 => get OTP for Payment Verification.
 
 Registratin (POST): Returns a success or failure status
@@ -41,7 +41,7 @@ Sample Payload = {
 }
 
 
-Credit (POST): The routed is protected, so the token generated on login must be supplied as a parm with the key "access_token"
+Credit (POST): The route is protected, so the token generated on login must be supplied as a request param with the key "access_token"
 SamplePayload = {
 	"amount": 5000,
 	"reference_number": "ajolscQF147h",
