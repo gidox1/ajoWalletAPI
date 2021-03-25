@@ -12,11 +12,10 @@ const auth = new Auth();
 const _ = require('lodash');
 const operand = constants.operandEquals;
 const action = constants.actionCredit;
-
+const success = 'success'
 
 class AgentService 
 {
-    
     /**
      *Handles Agent Creation
      *
@@ -35,13 +34,12 @@ class AgentService
             const parsedObject = constants.parseJSON(agentCheck);
             agentData.reference_number = reference_number;
 
-            if(parsedObject.length < 1 || parsedObject == null) {
+            if(!parsedObject || !parsedObject.length) {
                 await wallet.create(reference_number);
                     return new Promise(async (resolve, reject) => {
                         return new AgentModel()
                         .save(agentData, {method: 'insert'})
                         .then(Response => {
-                            console.log('Agent details saved')
                             return resolve({
                                 status: true,
                                 body: Response
@@ -52,7 +50,7 @@ class AgentService
                         })
                     })
             }
-            if(parsedObject[0].email) {return {status: false, message: 'Agent already exits'}};
+            if(parsedObject[0].hasOwnProperty('email')) {return {status: false, message: 'Agent already exits'}};
     }
 
 
@@ -73,7 +71,7 @@ class AgentService
         const checkParams ={email: userEmail, password: userPassword };
         const compare = await auth.comparePassword(password, userPassword);
 
-        if(compare === true) {
+        if(compare) {
             const userToken = await auth.getToken(params, checkParams, parsedObject);
             return {
                 status: true,
@@ -94,7 +92,7 @@ class AgentService
     async getOtp(reference_number) {
         const generatedOtp = await constants.otpGenerator();
         const data = {reference_number, generatedOtp}
-        new OtpModel().saveOtp(data);
+        await new OtpModel().saveOtp(data);
         return {
             status: true,
             otp: generatedOtp
@@ -118,65 +116,85 @@ class AgentService
         const agentCheck = await this.checkUser('email', operand, email);
         const parsedObject = constants.parseJSON(agentCheck);
         const userPassword = await parsedObject[0].password;
-        const checkParams ={email: email, password: userPassword};
         const compare = await auth.comparePassword(sentPassword, userPassword);
         const senderRefNum = userObjectFromToken.reference_number
 
-        if(compare === true) {
+        if(compare) {
             const trans = await new OtpModel().findOtp('agent_reference_number', operand, senderRefNum);
             const parsedObject = constants.parseJSON(trans);
             const retrievedOtp = parsedObject[0].otp;
 
-            if(retrievedOtp != otp) {
-                console.log('invalid otp')
+            if(retrievedOtp !== otp) {
                 return {status: false, message: 'Invalid otp supplied'}
             }
 
             const recepientWallet = await new WalletModel().findWallet('reference_number', operand, reference_number);
             const parsedWallet = constants.parseJSON(recepientWallet);
 
-            if(parsedWallet.length < 1 || parsedWallet == null) {
+            if(!parsedWallet.lengt) {
                 return {status: false, message: 'reference_number does not exist'}
             };
 
             const recepientReferenceNumber = reference_number;
             const transactionStatus = await wallet.validateTransaction({amount, senderRefNum});
-
-            if(transactionStatus == true) {
-                const current_balance = parsedWallet[0]['current_balance'] + amount;
-                const previous_balance = parsedWallet[0]['current_balance'];
-                return new WalletModel().updateWallet({current_balance, previous_balance, reference_number})
-                    .then(async (transactionResponse) => {
-                        await new TransactionModel().logTransaction({senderRefNum, amount, action, recepientReferenceNumber, status: transactionResponse.status});
-
-                        if(transactionResponse.status == 'success') {
-                            const sendersWallet = await new WalletModel().findWallet('reference_number', operand, senderRefNum);
-                            const walletDetails = constants.parseJSON(sendersWallet);
-
-                            const sendersCurrentBalance = walletDetails[0]['current_balance'] - amount;
-                            const sendersPreviousBalance = walletDetails[0]['current_balance'];
-                            return await new WalletModel()
-                                .updateWallet({current_balance: sendersCurrentBalance, previous_balance: sendersPreviousBalance, reference_number: senderRefNum})
-                                    .then(update => {
-                                        return (update.status == 'success') ? {status: true, message: 'Credit Successful'} 
-                                        : {status: false, message: constants.failedTransactionMessage}
-                                    })
-                                    .catch(err => {
-                                        throw err;
-                                    })
-                        }
-                    })
-                    .catch(error => {
-                        throw error;
-                    })
+            const transactionData = {
+                parsedWallet,
+                amount,
+                recepientReferenceNumber,
             }
-                return {status: false, message: 'Insufficient Funds. Go and hammer'}
+
+            if(transactionStatus) {
+                return await this.processTransaction(transactionData);
+            }
+            return {status: false, message: 'Insufficient Funds. Go and hammer'}
         } else {
             return {status: false, message: 'Invalid email or password'}
         }
 
     }
 
+
+    /**
+     * Process transaction
+     * @param {Object} data 
+     */
+    processTransaction(data) {
+        const current_balance = parsedWallet[0]['current_balance'] + amount;
+        const previous_balance = parsedWallet[0]['current_balance'];
+        return new WalletModel().updateWallet({current_balance, previous_balance, reference_number})
+            .then(async (transactionResponse) => {
+                await new TransactionModel()
+                    .logTransaction({
+                        senderRefNum, 
+                        amount, 
+                        action, 
+                        recepientReferenceNumber, 
+                        status: transactionResponse.status
+                });
+
+                if(transactionResponse.status === success) {
+                    const sendersWallet = await new WalletModel()
+                        .findWallet('reference_number', operand, senderRefNum);
+                    const walletDetails = constants.parseJSON(sendersWallet);
+
+                    const sendersCurrentBalance = walletDetails[0]['current_balance'] - amount;
+                    const sendersPreviousBalance = walletDetails[0]['current_balance'];
+                    return await new WalletModel().updateWallet({
+                        current_balance: sendersCurrentBalance, 
+                        previous_balance: sendersPreviousBalance, 
+                        reference_number: senderRefNum
+                    })
+                }
+            })
+            .then(update => {
+                return (update.status === success) 
+                    ? {status: true, message: 'Credit Successful'} 
+                    : {status: false, message: constants.failedTransactionMessage}
+            })
+            .catch(error => {
+                throw error;
+            })
+    }
 
 
 

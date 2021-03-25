@@ -14,7 +14,6 @@ class Authenticate {
     * jwt
     */
     getToken(userParams, checkParams, payload) {
-        
         const {userEmail, userPassword} = userParams;
         const {checkEmail, checkPassword} = checkParams;
 

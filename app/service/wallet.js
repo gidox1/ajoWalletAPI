@@ -12,12 +12,11 @@ class Wallet {
         const previous_balance = parseFloat(0).toFixed(2);
         const reference_number = referenceNumber;
         const data = {reference_number,current_balance, previous_balance}
-        new StatusModel().setStatusActive();
+        await new StatusModel().setStatusActive();
 
         return new WalletModel()
-                .save(data, {method: 'insert'})
+                .save(data)
                 .then(Response => {
-                    console.log('Wallet details saved')
                     return {
                         status: true,
                         body: Response
