@@ -33,7 +33,7 @@ class Wallet {
         const parsedObject = constants.parseJSON(senderWalletDetails);
         const senderBalance = parsedObject[0]['current_balance'];
 
-        if(amount > senderBalance) {
+        if(parseInt(amount) > parseInt(senderBalance)) {
             return false;
         }
         return true;
