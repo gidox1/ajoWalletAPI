@@ -20,7 +20,7 @@
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "bookshelf": "^0.15.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
     "knex": "0.15.0",
     "lodash": "^4.17.11",
